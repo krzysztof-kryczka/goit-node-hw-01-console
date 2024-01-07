@@ -1,6 +1,7 @@
 const { error } = require("console");
 const fs = require("fs/promises");
 const path = require("path");
+const { nanoid } = require("nanoid");
 
 /*
     Path to the contacts.json file
@@ -89,6 +90,31 @@ const removeContact = async (contactId) => {
   }
 };
 
-function addContact(name, email, phone) {
-  // ...twój kod
-}
+/**
+ * This function adds a new contact to the contacts list.
+ *
+ * @param {string} name - The name of the contact.
+ * @param {string} email - The email address of the contact.
+ * @param {string} phone - The phone number of the contact.
+ * @returns {object} - An object containing the success status, message, and result.
+ */
+const addContact = async (name, email, phone) => {
+  try {
+    const contacts = await listContacts();
+    const newContact = { id: nanoid(), name, email, phone };
+    contacts.push(newContact);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    return {
+      success: true,
+      message: `The new contact has been successfully added.`,
+      result: newContact,
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      success: false,
+      message: `An error occurred while adding the new contact.`,
+      result: null,
+    };
+  }
+};
