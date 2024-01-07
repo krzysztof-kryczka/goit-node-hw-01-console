@@ -31,7 +31,7 @@ const listContacts = async () => {
  * Array.find method to find the contact with the specified ID.
  * If no contact is found, it return null. Otherwise, it returns the
  * contact object.
- * @param {number} id - The ID of the contact to retrieve.
+ * @param {number} contactId - The ID of the contact to retrieve.
  * @returns {Promise<Object|null>} - A promise that resolves to the contact
  *                                   object with the specified ID, or null
  *                                   if no contact is found.
@@ -50,9 +50,44 @@ const getContactById = async (contactId) => {
   }
 };
 
-function removeContact(contactId) {
-  // ...twój kod
-}
+/**
+ * This function reads the contents of a file named `contacts.json` and parses it into a JavaScript object.
+ * It then uses the `findIndex` method to find the index of the contact with the specified ID.
+ * If the contact is found, the `splice` method is used to remove the contact from the array.
+ * The updated list of contacts is then written back to the file.
+ * If an error occurs while reading or writing the file, the function will catch the error and log it to the console.
+ * The function returns the result of the operation.
+ *
+ * @param {string} contactId - The ID of the contact to be removed.
+ * @returns {object} - An object containing the success status and message.
+ */
+const removeContact = async (contactId) => {
+  try {
+    const contacts = await listContacts();
+    const index = contacts.findIndex((item) => item.id === contactId);
+    if (index === -1) {
+      return {
+        success: false,
+        message: `Contact ID ${contactId} not found.`,
+        result: null,
+      };
+    }
+    const [result] = contacts.splice(index, 1);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    return {
+      success: true,
+      message: `Contact ID ${contactId} was successfully deleted.`,
+      result: result,
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      success: false,
+      message: `An error occurred while removing the contact.`,
+      result: null,
+    };
+  }
+};
 
 function addContact(name, email, phone) {
   // ...twój kod
